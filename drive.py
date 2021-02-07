@@ -12,9 +12,15 @@ from PIL import Image
 from flask import Flask
 from io import BytesIO
 
-from keras.models import load_model
+#from keras.models import load_model
 import h5py
-from keras import __version__ as keras_version
+
+# + update 
+import tensorflow as tf
+from tensorflow.keras.models import load_model
+from tensorflow.version import VERSION as keras_version
+from PIL import ImageDraw
+# - update 
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -43,8 +49,8 @@ class SimplePIController:
         return self.Kp * self.error + self.Ki * self.integral
 
 
-controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+controller = SimplePIController(0.75, 0.002)
+set_speed = 15.0
 controller.set_desired(set_speed)
 
 
@@ -60,18 +66,33 @@ def telemetry(sid, data):
         # The current image from the center camera of the car
         imgString = data["image"]
         image = Image.open(BytesIO(base64.b64decode(imgString)))
-        image_array = np.asarray(image)
-        steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+        # + update
+        image_copy = image.copy()
+        image_copy = image_copy.crop( (0,69,320,138) )
+        image_copy = image_copy.resize( (200, 66) )
+        image_array = tf.keras.preprocessing.image.img_to_array( image_copy, dtype=np.uint8 )        
+        image_array = tf.expand_dims( image_array, axis=0 )
+        # - update
+        steering_angle = float(model.predict(image_array, batch_size=1))
+        # + update
+        steering_angle = (steering_angle - 0.5) * 2.4175
+        # - update
 
         throttle = controller.update(float(speed))
 
-        print(steering_angle, throttle)
+        print(' {:+6.2f} {:+6.2f} {:5.2f}'.format( 25.0*steering_angle, throttle, float(speed) ) )
         send_control(steering_angle, throttle)
 
         # save frame
         if args.image_folder != '':
             timestamp = datetime.utcnow().strftime('%Y_%m_%d_%H_%M_%S_%f')[:-3]
             image_filename = os.path.join(args.image_folder, timestamp)
+            # + update
+            draw = ImageDraw.Draw(image)
+            draw.text( (40, 20),  'CarND-Behavioral-Cloning-P3, Autonomus' )            
+            draw.text( (20, 140),  'ANGLE: {:+6.2f} deg.'.format( 25.0*steering_angle  ) )
+            draw.text( (180, 140), 'SPEED: {:5.2f} MPH'.format(  float(speed) ) )
+            # - update
             image.save('{}.jpg'.format(image_filename))
     else:
         # NOTE: DON'T EDIT THIS.
