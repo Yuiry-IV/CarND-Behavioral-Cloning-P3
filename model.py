@@ -83,20 +83,20 @@ def prepare_from_folder( path ) :
 
 def prepare_all_data( ):
    """
-      prepare data from requred folders
+   prepare data from requred folders
    """
-    BASE_PATH = '../data/'
-    all_data = []
-    all_data = all_data + prepare_from_folder( BASE_PATH + 'ref/')
-    all_data = all_data + prepare_from_folder( BASE_PATH + 'track_2_1/')
-    all_data = all_data + prepare_from_folder( BASE_PATH + 'track_2_2/')
-    all_data = all_data + prepare_from_folder( BASE_PATH + 'TR02/')
-    all_data = all_data + prepare_from_folder( BASE_PATH + 'TR0129/')
-    all_data = all_data + prepare_from_folder( BASE_PATH + 'T203/')
-    
-    print( 'samples :', len(all_data) )
-    
-    return all_data
+   BASE_PATH = '../data/'
+   all_data = []
+   all_data = all_data + prepare_from_folder( BASE_PATH + 'ref/')
+   all_data = all_data + prepare_from_folder( BASE_PATH + 'track_2_1/')
+   all_data = all_data + prepare_from_folder( BASE_PATH + 'track_2_2/')
+   all_data = all_data + prepare_from_folder( BASE_PATH + 'TR02/')
+   all_data = all_data + prepare_from_folder( BASE_PATH + 'TR0129/')
+   all_data = all_data + prepare_from_folder( BASE_PATH + 'T203/')
+
+   print( 'samples :', len(all_data) )
+
+   return all_data
 
 def to_np_array( data, test_run=False ):
    """
@@ -185,7 +185,7 @@ x, y = to_np_array( raw_data, test_run=False )
 with tf.device('/GPU:0'):
    # prepapre a model check point callback
    callback_model_checkpoint = tf.keras.callbacks.ModelCheckpoint(
-     filepath='./saved/model.{val_loss:.4f}.{epoch:02d}.h5',
+     filepath='./output/model.{val_loss:.4f}.{epoch:02d}.h5',
      monitor='val_loss',
      save_best_only=True
    )
