@@ -16,7 +16,7 @@ For mode details please take a look [writeup file](./writeup_yivanov.md)
 |------|------|
 |Microsoft Windows| 10 |
 |Python | 3.8 |
-|TensorFlow | 2.4.0 |
+|TensorFlow | 2.4.1 |
 |NVIDIA Driver Version | 461.40 |      
 |CUDA Version | 11.2 |
 |cudnn|8.1.0.77|
